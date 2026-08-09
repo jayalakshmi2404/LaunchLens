@@ -1,0 +1,121 @@
+.risk-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.risk-score-card {
+  padding: 18px 20px;
+}
+
+.risk-score-big {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+.risk-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.risk-item {
+  display: grid;
+  grid-template-columns: 160px 1fr 130px;
+  gap: 20px;
+  align-items: center;
+  padding: 18px 20px;
+}
+
+.risk-cat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.risk-cat-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: #f2f3fa;
+}
+
+.sev-pill {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 20px;
+  width: fit-content;
+}
+
+.sev-pill.high {
+  background: rgba(251, 113, 133, 0.15);
+  color: #fb7185;
+}
+
+.sev-pill.medium {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+}
+
+.sev-pill.low {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+}
+
+.risk-desc {
+  font-size: 13.5px;
+  color: #a8adcf;
+  line-height: 1.55;
+}
+
+.risk-meter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.risk-meter .bar-track {
+  width: 100%;
+  height: 6px;
+}
+
+.risk-score-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: #6b7299;
+}
+
+@media (max-width: 900px) {
+  .risk-summary {
+    grid-template-columns: 1fr;
+  }
+  .risk-item {
+    grid-template-columns: 1fr;
+  }
+  .risk-meter {
+    align-items: flex-start;
+  }
+}
+
+.empty-state {
+  padding: 40px 30px;
+  text-align: center;
+}
+
+.empty-state .waiting-note {
+  margin-bottom: 20px;
+  padding: 0;
+}
+
+.empty-state-link {
+  display: inline-block;
+  text-decoration: none;
+  width: auto;
+  padding: 10px 24px;
+}

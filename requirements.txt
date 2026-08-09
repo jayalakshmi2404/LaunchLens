@@ -1,0 +1,50 @@
+================================================================================
+REQUIREMENTS
+LaunchLens - System & Package Dependencies
+================================================================================
+
+HARDWARE REQUIREMENTS
+--------------------------------------------------------------------------------
+  RAM             4 GB minimum (8 GB recommended)
+  Disk space       500 MB free
+  Processor        Any modern CPU (last ~8 years)
+  Internet          Only needed for live stock quotes; otherwise runs local
+
+
+SOFTWARE REQUIREMENTS
+--------------------------------------------------------------------------------
+  OS                Windows, macOS, or Linux
+  Node.js            v18 or higher   -> https://nodejs.org
+  PostgreSQL          v13 or higher   -> https://www.postgresql.org/download
+  npm                  Included with Node.js
+  Browser               Any modern browser
+
+
+FRONTEND PACKAGES  (frontend/package.json)
+--------------------------------------------------------------------------------
+  react                ^19.2.7
+  react-dom             ^19.2.7
+  react-router-dom       ^7.18.1
+  chart.js                 ^4.5.1
+  vite (dev)                 ^8.1.1
+
+
+BACKEND PACKAGES  (backend/package.json)
+--------------------------------------------------------------------------------
+  express              ^4.19.2
+  pg                    ^8.12.0
+  cors                    ^2.8.5
+  dotenv                    ^16.4.5
+
+
+INSTALL
+--------------------------------------------------------------------------------
+  cd backend  && npm install
+  cd frontend && npm install
+
+That installs everything above automatically - no manual package-by-package
+install needed.
+
+================================================================================
+END OF REQUIREMENTS
+================================================================================

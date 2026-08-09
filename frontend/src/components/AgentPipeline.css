@@ -1,0 +1,136 @@
+.agent-pipeline {
+  background: rgba(124, 58, 237, 0.06);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 14px;
+  padding: 22px 24px;
+}
+
+.agent-pipeline-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 13.5px;
+  color: #b794f6;
+  margin-bottom: 16px;
+}
+
+.agent-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #7c3aed;
+  flex-shrink: 0;
+  animation: agent-pulse 1.4s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(124, 58, 237, 0.7);
+}
+
+@keyframes agent-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.3); }
+}
+
+.agent-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.agent-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  transition: opacity 0.2s ease;
+}
+
+.agent-step.pending {
+  opacity: 0.4;
+}
+
+.agent-step-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.agent-step.done .agent-step-icon {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+}
+
+.agent-step.active .agent-step-icon {
+  background: rgba(124, 58, 237, 0.18);
+}
+
+.agent-step.pending .agent-step-icon {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.agent-step-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #565d85;
+}
+
+.agent-spinner {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(124, 58, 237, 0.25);
+  border-top-color: #7c3aed;
+  animation: agent-spin 0.7s linear infinite;
+}
+
+@keyframes agent-spin {
+  to { transform: rotate(360deg); }
+}
+
+.agent-step.done .agent-step-label {
+  color: #f2f3fa;
+  font-weight: 500;
+}
+
+.agent-step.active .agent-step-label {
+  color: #d8b4fe;
+  font-weight: 600;
+}
+
+.agent-step.pending .agent-step-label {
+  color: #6b7299;
+}
+
+.results-reveal {
+  animation: results-fade-in 0.4s ease both;
+}
+
+@keyframes results-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #b794f6;
+  background: rgba(124, 58, 237, 0.15);
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+.ai-badge svg {
+  flex-shrink: 0;
+}
