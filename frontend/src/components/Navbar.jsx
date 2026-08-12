@@ -5,6 +5,7 @@ import './Navbar.css'
 const links = [
   { to: '/', label: 'Project Input' },
   { to: '/risk-assessment', label: 'Risk Assessment' },
+  { to: '/swot-analysis', label: 'SWOT Analysis' },  
   { to: '/recommendations', label: 'Recommendations' },
   { to: '/dashboard', label: 'Dashboard' },
 ]
