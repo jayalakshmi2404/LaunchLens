@@ -1,0 +1,71 @@
+.feas-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.feas-verdict-card {
+  padding: 18px 20px;
+}
+
+.feas-score-big {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+.feas-verdict-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 10px;
+  line-height: 1.3;
+}
+
+.feas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.feas-item {
+  padding: 18px 20px;
+}
+
+.feas-cat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.feas-cat-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: #f2f3fa;
+}
+
+.feas-score-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: #a8adcf;
+}
+
+.feas-desc {
+  font-size: 13.5px;
+  color: #a8adcf;
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+
+.feas-item .bar-track {
+  height: 6px;
+}
+
+@media (max-width: 900px) {
+  .feas-summary {
+    grid-template-columns: 1fr;
+  }
+}

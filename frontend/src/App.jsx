@@ -6,6 +6,7 @@ import { ProjectProvider } from './context/ProjectContext.jsx'
 import ProjectInput from './pages/ProjectInput.jsx'
 import RiskAssessment from './pages/RiskAssessment.jsx'
 import SwotAnalysis from './pages/SwotAnalysis.jsx'   // ← add near the other page imports
+import FeasibilityAnalysis from './pages/FeasibilityAnalysis.jsx'   // ← add near the other page imports
 import Recommendations from './pages/Recommendations.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 
@@ -28,6 +29,7 @@ export default function App() {
               <Route path="/risk-assessment" element={<RiskAssessment />} />
               <Route path="/recommendations" element={<Recommendations />} />
               <Route path="/swot-analysis" element={<SwotAnalysis />} />   {/* ← add after the Risk Assessment route */}
+              <Route path="/feasibility" element={<FeasibilityAnalysis />} />   {/* ← add right after the SWOT Analysis route */}
               <Route path="/dashboard" element={<Dashboard />} />
             </Routes>
           </main>
