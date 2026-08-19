@@ -4,29 +4,33 @@ import { query } from '../db/pool.js';
 const router = Router();
 
 // Fetch a live quote for an NSE-listed stock symbol.
-// Uses Yahoo Finance's public (unofficial, undocumented) quote endpoint - no
-// API key required, but it can change or rate-limit without notice. For a
-// production system, swap this for a proper provider (NSE's official data
-// feed, Alpha Vantage, or a broker API such as Zerodha Kite / Upstox).
 async function fetchLiveQuote(symbol) {
-  const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}.NS`;
-  const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-  if (!res.ok) throw new Error(`Quote fetch failed: ${res.status}`);
-  const data = await res.json();
-  const quote = data?.quoteResponse?.result?.[0];
-  if (!quote) return null;
-  return {
-    price: quote.regularMarketPrice ?? null,
-    changePercent: quote.regularMarketChangePercent ?? null,
-    marketCapCr: quote.marketCap ? +(quote.marketCap / 1e7).toFixed(0) : null, // paise-free INR -> Crore
-    currency: quote.currency ?? 'INR',
-    asOf: quote.regularMarketTime ? new Date(quote.regularMarketTime * 1000).toISOString() : null,
-  };
+  try {
+    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}.NS`;
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/json, text/plain, */*'
+      }
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const quote = data?.quoteResponse?.result?.[0];
+    if (!quote) return null;
+    return {
+      price: quote.regularMarketPrice ?? null,
+      changePercent: quote.regularMarketChangePercent ?? null,
+      marketCapCr: quote.marketCap ? +(quote.marketCap / 1e7).toFixed(0) : null,
+      currency: quote.currency ?? 'INR',
+      asOf: quote.regularMarketTime ? new Date(quote.regularMarketTime * 1000).toISOString() : null,
+    };
+  } catch (err) {
+    return null;
+  }
 }
 
 // GET /api/competitors/:industry            -> stored data only
 // GET /api/competitors/:industry?live=true  -> stored data + live stock quote
-//                                               merged in for public companies
 router.get('/:industry', async (req, res) => {
   const { industry } = req.params;
   const wantLive = req.query.live === 'true';
@@ -37,20 +41,28 @@ router.get('/:industry', async (req, res) => {
       [industry]
     );
 
+    // Deduplicate competitor entries by name, retaining the record with the highest market share
+    const uniqueMap = new Map();
+    for (const row of result.rows) {
+      const existing = uniqueMap.get(row.name);
+      if (!existing || Number(row.market_share_pct) > Number(existing.market_share_pct)) {
+        uniqueMap.set(row.name, row);
+      }
+    }
+    const rows = Array.from(uniqueMap.values()).sort((a, b) => Number(b.market_share_pct) - Number(a.market_share_pct));
+
     if (!wantLive) {
-      return res.json(result.rows);
+      return res.json(rows);
     }
 
     const enriched = await Promise.all(
-      result.rows.map(async (row) => {
+      rows.map(async (row) => {
         if (!row.is_public_company || !row.stock_symbol) return row;
-        try {
-          const live = await fetchLiveQuote(row.stock_symbol);
+        const live = await fetchLiveQuote(row.stock_symbol);
+        if (live) {
           return { ...row, live };
-        } catch (err) {
-          console.error(`Live quote failed for ${row.stock_symbol}:`, err.message);
-          return { ...row, live: null, liveError: 'Live quote unavailable' };
         }
+        return { ...row, live: null, liveError: 'Live quote unavailable' };
       })
     );
 

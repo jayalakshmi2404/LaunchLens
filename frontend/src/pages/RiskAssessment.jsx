@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useProject } from '../context/ProjectContext.jsx'
 import { computeRisks } from '../utils/riskEngine.js'
+import MitigationEnginePanel from '../components/MitigationEnginePanel.jsx'
 import './RiskAssessment.css'
 
 const sevColor = { high: '#fb7185', medium: '#fbbf24', low: '#34d399' }
@@ -14,7 +15,7 @@ export default function RiskAssessment() {
       <div className="page-wide">
         <div className="page-header">
           <h1>Risk Assessment</h1>
-          <p>Automated risk flags based on your project inputs and the current Indian market data.</p>
+          <p>Automated risk flags based on your project inputs and current market data.</p>
         </div>
         <div className="card empty-state">
           <p className="waiting-note">
@@ -76,6 +77,9 @@ export default function RiskAssessment() {
           </div>
         ))}
       </div>
+
+      {/* Task 2: Integrated Mitigation & Improvement Engine Panel */}
+      <MitigationEnginePanel projectData={projectData} />
     </div>
   )
 }

@@ -27,3 +27,33 @@ export async function submitProject(project) {
   });
   return handle(res);
 }
+
+export async function fetchAiRecommendations(projectData) {
+  const res = await fetch(`${API_BASE}/api/recommendations/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ projectData }),
+  });
+  return handle(res);
+}
+
+export async function fetchMitigations(projectData) {
+  const res = await fetch(`${API_BASE}/api/mitigations/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ projectData }),
+  });
+  return handle(res);
+}
+
+export async function runWorkflow(projectData) {
+  const res = await fetch(`${API_BASE}/api/workflow/run`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ projectData }),
+  });
+  return handle(res);
+}
+
+
+
