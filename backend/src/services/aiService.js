@@ -188,7 +188,7 @@ Each object must have these exact keys:
       console.log('[AIService] Calling Gemini API for strategic recommendations...');
       const ai = new GoogleGenAI({ apiKey: geminiKey });
       const response = await ai.models.generateContent({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         contents: prompt,
         config: {
           responseMimeType: 'application/json',

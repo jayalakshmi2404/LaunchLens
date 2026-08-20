@@ -153,9 +153,8 @@ function validateAndNormalizeMitigations(parsedData) {
  * Core Mitigation Engine function. Reuses Gemini/OpenAI APIs or falls back to rule-based synthesis.
  */
 export async function generateMitigations(projectData) {
-  const geminiKey = process.env.GEMINI_API_KEY;
-  const openaiKey = process.env.OPENAI_API_KEY;
-
+const geminiKey = process.env.GEMINI_API_KEY?.trim();
+const openaiKey = process.env.OPENAI_API_KEY?.trim();
   if (!geminiKey && !openaiKey) {
     console.warn('[MitigationEngine] Neither GEMINI_API_KEY nor OPENAI_API_KEY set. Using deterministic mitigation engine.');
     return {
@@ -186,8 +185,7 @@ Identify 4 key strategic risk/problem areas for this project based on the actual
 For EACH risk area, provide complete, actionable mitigation and improvement strategies.
 
 FORMAT:
-Respond ONLY with a valid JSON array containing exactly 4 objects. No markdown outside JSON.
-Keys required for each object:
+Respond ONLY with a valid JSON object containing a "mitigations" array with exactly 4 objects. No markdown outside JSON.
 - "riskProblem": (string, specific risk/problem identified)
 - "possibleCauses": (string, root causes based on data)
 - "severity": (string, "high" | "medium" | "low")
@@ -203,7 +201,7 @@ Keys required for each object:
       console.log('[MitigationEngine] Calling Gemini API for mitigations...');
       const ai = new GoogleGenAI({ apiKey: geminiKey });
       const response = await ai.models.generateContent({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         contents: prompt,
         config: {
           responseMimeType: 'application/json',
