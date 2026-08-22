@@ -150,18 +150,71 @@ function validateAndNormalizeMitigations(parsedData) {
 }
 
 /**
+ * Resilient multi-model Gemini API caller with SDK & REST fallback.
+ */
+async function callGeminiApi(apiKey, prompt) {
+  const models = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-2.5-flash', 'gemini-1.5-flash'];
+
+  // Path A: Try GoogleGenAI SDK with candidate models
+  for (const model of models) {
+    try {
+      const ai = new GoogleGenAI({ apiKey });
+      const response = await ai.models.generateContent({
+        model,
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+          temperature: 0.2
+        }
+      });
+      if (response && response.text) {
+        return response.text;
+      }
+    } catch (err) {
+      // Continue to next model candidate
+    }
+  }
+
+  // Path B: Try Direct REST API endpoint with candidate models
+  for (const model of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: 'application/json',
+            temperature: 0.2
+          }
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) return text;
+      }
+    } catch (err) {
+      // Continue to next model candidate
+    }
+  }
+
+  throw new Error('Could not connect to Gemini API models');
+}
+
+/**
  * Core Mitigation Engine function. Reuses Gemini/OpenAI APIs or falls back to rule-based synthesis.
  */
 export async function generateMitigations(projectData) {
-const geminiKey = process.env.GEMINI_API_KEY?.trim();
-const openaiKey = process.env.OPENAI_API_KEY?.trim();
+  const geminiKey = process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.trim() : '';
+  const openaiKey = process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.trim() : '';
+
   if (!geminiKey && !openaiKey) {
-    console.warn('[MitigationEngine] Neither GEMINI_API_KEY nor OPENAI_API_KEY set. Using deterministic mitigation engine.');
     return {
       mitigations: generateFallbackMitigations(projectData),
       isAiGenerated: false,
-      provider: 'rule_engine',
-      warning: 'AI API keys not configured. Generated mitigations using deterministic project and risk data analysis.'
+      provider: 'rule_engine'
     };
   }
 
@@ -185,7 +238,8 @@ Identify 4 key strategic risk/problem areas for this project based on the actual
 For EACH risk area, provide complete, actionable mitigation and improvement strategies.
 
 FORMAT:
-Respond ONLY with a valid JSON object containing a "mitigations" array with exactly 4 objects. No markdown outside JSON.
+Respond ONLY with a valid JSON array containing exactly 4 objects. No markdown outside JSON.
+Keys required for each object:
 - "riskProblem": (string, specific risk/problem identified)
 - "possibleCauses": (string, root causes based on data)
 - "severity": (string, "high" | "medium" | "low")
@@ -199,19 +253,7 @@ Respond ONLY with a valid JSON object containing a "mitigations" array with exac
   if (geminiKey) {
     try {
       console.log('[MitigationEngine] Calling Gemini API for mitigations...');
-      const ai = new GoogleGenAI({ apiKey: geminiKey });
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
-          responseMimeType: 'application/json',
-          temperature: 0.2
-        }
-      });
-
-      const rawText = response.text;
-      if (!rawText) throw new Error('Empty response from Gemini');
-
+      const rawText = await callGeminiApi(geminiKey, prompt);
       const parsed = JSON.parse(rawText);
       const validated = validateAndNormalizeMitigations(parsed);
 

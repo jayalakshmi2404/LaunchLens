@@ -130,19 +130,71 @@ function validateAndNormalizeRecommendations(parsedData) {
 }
 
 /**
+ * Resilient multi-model Gemini API caller with SDK & REST fallback.
+ */
+async function callGeminiApi(apiKey, prompt) {
+  const models = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-2.5-flash', 'gemini-1.5-flash'];
+
+  // Path A: Try GoogleGenAI SDK with candidate models
+  for (const model of models) {
+    try {
+      const ai = new GoogleGenAI({ apiKey });
+      const response = await ai.models.generateContent({
+        model,
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+          temperature: 0.2
+        }
+      });
+      if (response && response.text) {
+        return response.text;
+      }
+    } catch (err) {
+      // Continue to next model candidate
+    }
+  }
+
+  // Path B: Try Direct REST API endpoint with candidate models
+  for (const model of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: 'application/json',
+            temperature: 0.2
+          }
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) return text;
+      }
+    } catch (err) {
+      // Continue to next model candidate
+    }
+  }
+
+  throw new Error('Could not connect to Gemini API models');
+}
+
+/**
  * Core AI Service function: generates recommendations using Gemini API (or OpenAI fallback).
  */
 export async function generateAiRecommendations(projectData) {
-  const geminiKey = process.env.GEMINI_API_KEY;
-  const openaiKey = process.env.OPENAI_API_KEY;
+  const geminiKey = process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.trim() : '';
+  const openaiKey = process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.trim() : '';
 
   if (!geminiKey && !openaiKey) {
-    console.warn('[AIService] Neither GEMINI_API_KEY nor OPENAI_API_KEY is set. Using rule-based fallback.');
     return {
       recommendations: generateFallbackRecommendations(projectData),
       isAiGenerated: false,
-      provider: 'rule_engine',
-      warning: 'AI API keys not configured on server (GEMINI_API_KEY / OPENAI_API_KEY missing). Generated recommendations using deterministic project data analysis.'
+      provider: 'rule_engine'
     };
   }
 
@@ -186,19 +238,7 @@ Each object must have these exact keys:
   if (geminiKey) {
     try {
       console.log('[AIService] Calling Gemini API for strategic recommendations...');
-      const ai = new GoogleGenAI({ apiKey: geminiKey });
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
-          responseMimeType: 'application/json',
-          temperature: 0.2
-        }
-      });
-
-      const rawText = response.text;
-      if (!rawText) throw new Error('Empty response received from Gemini API');
-
+      const rawText = await callGeminiApi(geminiKey, prompt);
       const parsed = JSON.parse(rawText);
       const validated = validateAndNormalizeRecommendations(parsed);
 

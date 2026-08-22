@@ -120,7 +120,13 @@ export default function ProjectInput() {
         fetchCompetitors(industry, { live: liveMode }),
       ])
       const normalizedMarket = normalizeMarket(marketRow)
-      const normalizedCompetitors = competitorRows.map(normalizeCompetitor)
+      const rawNormalized = competitorRows.map(normalizeCompetitor)
+      const seenNames = new Set()
+      const normalizedCompetitors = rawNormalized.filter((c) => {
+        if (seenNames.has(c.name)) return false
+        seenNames.add(c.name)
+        return true
+      })
       setMarket(normalizedMarket)
       setCompetitors(normalizedCompetitors)
       setBackendOnline(true)

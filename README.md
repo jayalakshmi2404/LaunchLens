@@ -24,7 +24,7 @@ LaunchLens allows users to submit a startup project idea (industry, business mod
 * **Framework**: Express.js (`express` ^4.19.2)
 * **Runtime**: Node.js ES Modules (`"type": "module"`)
 * **Database**: PostgreSQL (via `pg` ^8.12.0)
-* **AI Provider**: Google Gemini API (`@google/genai` `gemini-2.5-flash`), OpenAI API (`gpt-4o-mini`), and deterministic project data rule engine fallback
+* **AI Provider**: Google Gemini API (`@google/genai` `gemini-1.5-flash`), OpenAI API (`gpt-4o-mini`), and deterministic project data rule engine fallback
 * **Agent Workflow**: LangGraph (`@langchain/langgraph` ^1.4.10, `@langchain/core` ^1.2.8)
 
 ---
