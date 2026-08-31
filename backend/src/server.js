@@ -8,6 +8,7 @@ import competitorsRouter from './routes/competitors.js';
 import recommendationsRouter from './routes/recommendations.js';
 import mitigationsRouter from './routes/mitigations.js';
 import workflowRouter from './routes/workflow.js';
+import reportsRouter from './routes/reports.js';
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ app.use('/api/competitors', competitorsRouter);
 app.use('/api/recommendations', recommendationsRouter);
 app.use('/api/mitigations', mitigationsRouter);
 app.use('/api/workflow', workflowRouter);
+app.use('/api/reports', reportsRouter);
 
 app.use((err, _req, res, _next) => {
   console.error(err);

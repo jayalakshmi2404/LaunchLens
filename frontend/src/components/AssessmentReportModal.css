@@ -1,0 +1,564 @@
+.report-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 70px 16px 30px 16px;
+  overflow-y: auto;
+}
+
+.report-modal-container {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  max-width: 920px;
+  width: 100%;
+  color: #f8fafc;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  margin-top: 10px;
+  margin-bottom: 50px;
+  overflow: hidden;
+  position: relative;
+}
+
+.modal-header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background: #1e293b;
+  border-bottom: 1px solid #334155;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.actions-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.report-id-badge {
+  background: #3b82f6;
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.report-date {
+  color: #94a3b8;
+  font-size: 0.825rem;
+}
+
+.actions-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-action {
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 0.825rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-action:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.btn-action.download-pdf {
+  background: linear-gradient(135deg, #ec4899 0%, #d946ef 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(236, 72, 153, 0.4);
+}
+
+.btn-action.print {
+  background: #10b981;
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.btn-action.json {
+  background: #6366f1;
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
+}
+
+.btn-action.copy {
+  background: #0284c7;
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(2, 132, 199, 0.3);
+}
+
+.btn-close {
+  background: #ef4444;
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 0.825rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.report-body {
+  padding: 32px 28px;
+}
+
+.report-title-section {
+  text-align: center;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+}
+
+.brand-logo {
+  font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: #38bdf8;
+  margin-bottom: 6px;
+}
+
+.report-title {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 6px 0;
+  line-height: 1.3;
+}
+
+.report-subtitle {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.report-section {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.section-heading {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #38bdf8;
+  margin: 0 0 16px 0;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 8px;
+}
+
+.sub-heading {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 16px 0 12px 0;
+}
+
+.grid-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  background: #0f172a;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+}
+
+.summary-item .label {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
+
+.summary-item .val {
+  font-size: 0.9rem;
+  color: #f8fafc;
+}
+
+.summary-item .val.highlight {
+  color: #38bdf8;
+}
+
+.badge-risk {
+  font-weight: 700;
+}
+
+.badge-risk.high { color: #fca5a5; }
+.badge-risk.moderate { color: #fcd34d; }
+.badge-risk.low { color: #6ee7b7; }
+
+.description-text {
+  background: #0f172a;
+  padding: 12px 14px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #cbd5e1;
+  border-left: 3px solid #38bdf8;
+  line-height: 1.45;
+}
+
+.sizing-table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+}
+
+.report-table th, .report-table td {
+  border: 1px solid #334155;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.report-table th {
+  background: #0f172a;
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+.report-table td.bold {
+  font-weight: 700;
+}
+
+.badge-type {
+  background: #334155;
+  color: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.risk-grid-report {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.risk-card-mini {
+  background: #0f172a;
+  border: 1px solid #334155;
+  padding: 10px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+}
+
+.risk-card-mini.high { border-left: 3px solid #ef4444; }
+.risk-card-mini.medium { border-left: 3px solid #f59e0b; }
+.risk-card-mini.low { border-left: 3px solid #10b981; }
+
+.rc-name { font-size: 0.8rem; color: #94a3b8; font-weight: 600; }
+.rc-score { font-size: 1.1rem; font-weight: 800; color: #f8fafc; margin: 4px 0; }
+.rc-trigger { font-size: 0.75rem; color: #cbd5e1; }
+
+.feasibility-box {
+  background: #0f172a;
+  border: 1px solid #38bdf8;
+  padding: 12px 16px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.f-label { font-size: 0.9rem; color: #94a3b8; font-weight: 600; }
+.f-verdict { font-size: 0.95rem; color: #38bdf8; font-weight: 800; }
+
+.recs-list-report, .mitigations-list-report {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rec-card-report, .mit-card-report {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 14px;
+}
+
+.rec-header, .mit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rec-title, .mit-problem {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #f8fafc;
+}
+
+.badge-prio, .badge-sev {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.badge-prio.critical, .badge-sev.high { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+.badge-prio.high, .badge-sev.medium { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+.badge-prio.moderate, .badge-sev.low { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+
+.rec-body, .mit-causes, .mit-strat, .mit-action, .mit-outcome {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  margin: 4px 0;
+  line-height: 1.4;
+}
+
+.rec-rationale {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-style: italic;
+  margin-top: 6px;
+}
+
+.report-footer-print {
+  text-align: center;
+  border-top: 1px solid #334155;
+  padding-top: 16px;
+  margin-top: 24px;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 768px) {
+  .report-modal-overlay {
+    padding: 60px 8px 20px 8px;
+  }
+  .modal-header-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .actions-right {
+    justify-content: space-between;
+  }
+  .report-body {
+    padding: 20px 14px;
+  }
+  .grid-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ==========================================================================
+   MULTI-PAGE PRINT OVERHAUL (@media print)
+   Fixes the 1-page truncation bug so Chrome/Edge print ALL pages cleanly!
+   ========================================================================== */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 15mm;
+  }
+
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: visible !important;
+    height: auto !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Hide app navigation, background overlays, and modal controls */
+  body * {
+    visibility: hidden;
+  }
+
+  .no-print, .modal-header-actions, navbar, .page-header {
+    display: none !important;
+  }
+
+  /* Make printable area visible & un-bounded for multi-page flow */
+  .printable-area, .printable-area * {
+    visibility: visible !important;
+  }
+
+  .report-modal-overlay {
+    position: static !important;
+    background: transparent !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .printable-area {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    border: none !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .report-body {
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .report-title-section {
+    border-bottom: 2px solid #000000 !important;
+    margin-bottom: 20px !important;
+    padding-bottom: 12px !important;
+  }
+
+  .brand-logo {
+    color: #000000 !important;
+    font-size: 1.1rem !important;
+  }
+
+  .report-title {
+    color: #000000 !important;
+    font-size: 1.4rem !important;
+  }
+
+  .report-subtitle {
+    color: #333333 !important;
+    font-size: 0.85rem !important;
+  }
+
+  /* Multi-page break rules */
+  .report-section {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1.5px solid #000000 !important;
+    border-radius: 6px !important;
+    padding: 16px !important;
+    margin-bottom: 20px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .section-heading {
+    color: #000000 !important;
+    border-bottom: 1.5px solid #000000 !important;
+    font-size: 1.05rem !important;
+  }
+
+  .summary-item {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #000000 !important;
+  }
+
+  .summary-item .label {
+    color: #555555 !important;
+  }
+
+  .summary-item .val {
+    color: #000000 !important;
+  }
+
+  .description-text {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #000000 !important;
+    border-left: 4px solid #000000 !important;
+  }
+
+  .report-table, .report-table th, .report-table td {
+    border: 1px solid #000000 !important;
+    color: #000000 !important;
+    background: #ffffff !important;
+  }
+
+  .report-table th {
+    background: #f2f2f2 !important;
+    color: #000000 !important;
+  }
+
+  .risk-card-mini {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #000000 !important;
+  }
+
+  .rc-name { color: #444444 !important; }
+  .rc-score { color: #000000 !important; }
+  .rc-trigger { color: #222222 !important; }
+
+  .feasibility-box {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1.5px solid #000000 !important;
+  }
+
+  .f-label { color: #333333 !important; }
+  .f-verdict { color: #000000 !important; font-weight: bold !important; }
+
+  .rec-card-report, .mit-card-report {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #000000 !important;
+    margin-bottom: 10px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .rec-title, .mit-problem { color: #000000 !important; }
+  .rec-body, .mit-causes, .mit-strat, .mit-action, .mit-outcome { color: #222222 !important; }
+  .rec-rationale { color: #444444 !important; }
+
+  .report-footer-print {
+    border-top: 1px solid #000000 !important;
+    color: #444444 !important;
+  }
+}

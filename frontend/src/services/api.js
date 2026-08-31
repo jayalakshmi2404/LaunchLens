@@ -55,5 +55,39 @@ export async function runWorkflow(projectData) {
   return handle(res);
 }
 
+export async function generateAssessmentReport(projectData) {
+  const res = await fetch(`${API_BASE}/api/reports/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(projectData),
+  });
+  return handle(res);
+}
+
+export async function downloadAssessmentReportPdf(projectData) {
+  const res = await fetch(`${API_BASE}/api/reports/download-pdf`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(projectData),
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to download PDF report');
+  }
+
+  const blob = await res.blob();
+  const projectName = projectData?.form?.projectName || 'Startup';
+  const fileName = `${projectName.replace(/[^a-zA-Z0-9_-]/g, '_')}_Assessment_Report.pdf`;
+
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
+}
+
 
 

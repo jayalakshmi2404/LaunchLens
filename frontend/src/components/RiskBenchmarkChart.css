@@ -1,0 +1,133 @@
+.risk-benchmark-card {
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.benchmark-header {
+  margin-bottom: 20px;
+}
+
+.benchmark-title {
+  color: #f9fafb;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+}
+
+.benchmark-subtitle {
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.benchmark-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.benchmark-row {
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.row-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cat-label {
+  color: #f3f4f6;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.score-badges {
+  display: flex;
+  gap: 8px;
+  font-size: 0.775rem;
+}
+
+.badge-project {
+  background: #3b82f6;
+  color: #ffffff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.badge-benchmark {
+  background: #6b7280;
+  color: #ffffff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.badge-diff {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.badge-diff.higher {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border: 1px solid #ef4444;
+}
+
+.badge-diff.lower {
+  background: rgba(16, 185, 129, 0.2);
+  color: #6ee7b7;
+  border: 1px solid #10b981;
+}
+
+.dual-bar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bar-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bar-label {
+  width: 60px;
+  font-size: 0.775rem;
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.bar-bg {
+  flex: 1;
+  height: 8px;
+  background: #374151;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.project-fill {
+  background: linear-gradient(90deg, #3b82f6 0%, #6366f1 100%);
+}
+
+.bench-fill {
+  background: linear-gradient(90deg, #6b7280 0%, #9ca3af 100%);
+}

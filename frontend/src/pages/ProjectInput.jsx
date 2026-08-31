@@ -19,8 +19,39 @@ const initialState = {
   description: '',
 }
 
-const industryOptions = ['Technology', 'Healthcare', 'Fintech', 'E-commerce', 'Education', 'Manufacturing', 'Other']
-const businessModelOptions = ['SaaS', 'Marketplace', 'Subscription', 'Hardware', 'Services', 'Other']
+const industryOptions = [
+  'Technology',
+  'Healthcare',
+  'Fintech',
+  'E-commerce',
+  'Education',
+  'Manufacturing',
+  'Real Estate & PropTech',
+  'Agritech & FoodTech',
+  'CleanTech & Energy',
+  'Media & Entertainment',
+  'Automotive & Mobility',
+  'Travel & Hospitality',
+  'Retail & D2C',
+  'Cybersecurity & Cloud',
+  'Other'
+]
+
+const businessModelOptions = [
+  'SaaS',
+  'Marketplace',
+  'Subscription',
+  'Hardware',
+  'Services',
+  'Freemium',
+  'Transactional & Commission',
+  'D2C (Direct-to-Consumer)',
+  'B2B2C',
+  'Outcome & Performance Based',
+  'Ad-Supported',
+  'Licensing',
+  'Other'
+]
 
 function normalizeMarket(row) {
   return {

@@ -1,0 +1,136 @@
+.risk-heatmap-card {
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.risk-heatmap-card.empty {
+  text-align: center;
+  color: #9ca3af;
+  padding: 32px;
+}
+
+.heatmap-header {
+  margin-bottom: 20px;
+}
+
+.heatmap-title {
+  color: #f9fafb;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+}
+
+.heatmap-subtitle {
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.heatmap-cell {
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.heatmap-cell:hover {
+  transform: translateY(-2px);
+}
+
+.heatmap-cell.severity-high {
+  border-left: 4px solid #ef4444;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, #1f2937 100%);
+}
+
+.heatmap-cell.severity-medium {
+  border-left: 4px solid #f59e0b;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, #1f2937 100%);
+}
+
+.heatmap-cell.severity-low {
+  border-left: 4px solid #10b981;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, #1f2937 100%);
+}
+
+.cell-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.cat-name {
+  color: #f3f4f6;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.cat-score {
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #f9fafb;
+}
+
+.progress-bar-bg {
+  height: 6px;
+  background: #374151;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.severity-high .progress-bar-fill {
+  background: #ef4444;
+}
+
+.severity-medium .progress-bar-fill {
+  background: #f59e0b;
+}
+
+.severity-low .progress-bar-fill {
+  background: #10b981;
+}
+
+.cell-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sev-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.severity-high .sev-tag { color: #fca5a5; }
+.severity-medium .sev-tag { color: #fcd34d; }
+.severity-low .sev-tag { color: #6ee7b7; }
+
+.trigger-text {
+  color: #9ca3af;
+  font-size: 0.775rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
