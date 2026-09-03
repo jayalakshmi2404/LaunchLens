@@ -182,8 +182,6 @@ async function fetchLiveQuote(symbol) {
   }
 }
 
-const router = Router();
-
 // GET /api/competitors/:industry
 router.get('/:industry', async (req, res) => {
   const { industry } = req.params;
