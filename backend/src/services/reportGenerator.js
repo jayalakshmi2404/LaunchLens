@@ -1,7 +1,4 @@
-import { execSync } from 'child_process';
-import path from 'path';
-import fs from 'fs';
-import os from 'os';
+import puppeteer from 'puppeteer';
 import { generateAiRecommendations } from './aiService.js';
 import { generateMitigations } from './mitigationEngine.js';
 import { runLangGraphWorkflow } from './langgraphWorkflow.js';
@@ -249,32 +246,30 @@ export function generateReportHtml(report) {
 }
 
 /**
- * Generate PDF buffer using Edge Headless CLI on Windows.
+ * Generate PDF buffer using headless Chromium (Puppeteer).
+ * Cross-platform: works on Windows, Linux, and macOS (dev boxes, containers, cloud hosts).
  */
 export async function generateReportPdfBuffer(report) {
   const htmlContent = generateReportHtml(report);
-  const tmpDir = os.tmpdir();
-  const tmpHtmlPath = path.join(tmpDir, `report_${Date.now()}.html`);
-  const tmpPdfPath = path.join(tmpDir, `report_${Date.now()}.pdf`);
 
-  fs.writeFileSync(tmpHtmlPath, htmlContent, 'utf8');
-
-  const edgePath = `"C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"`;
-  const cmd = `${edgePath} --headless --no-pdf-header-footer --print-to-pdf="${tmpPdfPath}" "file:///${tmpHtmlPath.replace(/\\/g, '/')}"`;
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
 
   try {
-    execSync(cmd);
-    if (fs.existsSync(tmpPdfPath)) {
-      const pdfBuffer = fs.readFileSync(tmpPdfPath);
-      // Clean up temp files
-      try { fs.unlinkSync(tmpHtmlPath); fs.unlinkSync(tmpPdfPath); } catch (e) {}
-      return pdfBuffer;
-    } else {
-      throw new Error('PDF file compilation failed');
-    }
+    const page = await browser.newPage();
+    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: { top: '12mm', bottom: '12mm', left: '12mm', right: '12mm' }
+    });
+    return pdfBuffer;
   } catch (err) {
-    console.error('[PdfBuffer] Failed to compile PDF via Edge:', err.message);
-    try { fs.unlinkSync(tmpHtmlPath); } catch (e) {}
+    console.error('[PdfBuffer] Failed to compile PDF via headless Chromium:', err.message);
     throw err;
+  } finally {
+    await browser.close();
   }
 }
