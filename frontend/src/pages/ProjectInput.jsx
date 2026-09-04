@@ -10,15 +10,6 @@ import { marketSizing, competitorsByIndustry, formatINR } from '../data/marketDa
 import { fetchMarketData, fetchCompetitors, submitProject } from '../services/api.js'
 import './ProjectInput.css'
 
-const initialState = {
-  projectName: '',
-  industry: 'Technology',
-  businessModel: 'SaaS',
-  targetMarket: '',
-  budget: '',
-  description: '',
-}
-
 const industryOptions = [
   'Technology',
   'Healthcare',
@@ -111,25 +102,29 @@ function StatBox({ label, value, growth }) {
 }
 
 export default function ProjectInput() {
-  const { setProjectData } = useProject()
-  const [form, setForm] = useState(initialState)
-  const [submitted, setSubmitted] = useState(null)
-  const [submitError, setSubmitError] = useState(null)
+  const {
+    setProjectData,
+    form, setForm,
+    submitted, setSubmitted,
+    submitError, setSubmitError,
+    hasAnalyzed, setHasAnalyzed,
+    showResults, setShowResults,
+    market, setMarket,
+    competitors, setCompetitors,
+    backendOnline, setBackendOnline,
+    liveMode, setLiveMode,
+    analyzedIndustry, setAnalyzedIndustry,
+    resetProject,
+  } = useProject()
 
-  const [market, setMarket] = useState(null)
-  const [competitors, setCompetitors] = useState([])
-  const [backendOnline, setBackendOnline] = useState(true)
-  const [liveMode, setLiveMode] = useState(false)
+  // Purely transient UI/animation state — fine to reset on remount since it
+  // only matters while an analysis run is actively in progress. Once
+  // hasAnalyzed + showResults are true (from context), this is never
+  // consulted again until the next "Analyze Project" click.
   const [liveLoading, setLiveLoading] = useState(false)
-
-  // Analysis is now gated behind the "Analyze Project" click - nothing
-  // fetches or animates until the user explicitly asks for it.
-  const [hasAnalyzed, setHasAnalyzed] = useState(false)
   const [dataReady, setDataReady] = useState(false)
   const [stepsReady, setStepsReady] = useState(false)
-  const [showResults, setShowResults] = useState(false)
   const [pipelineKey, setPipelineKey] = useState(0)
-  const [analyzedIndustry, setAnalyzedIndustry] = useState(null)
 
   const agentSteps = [
     'Connecting to market intelligence database…',
@@ -233,14 +228,9 @@ export default function ProjectInput() {
   }
 
   const handleReset = () => {
-    setForm(initialState)
-    setSubmitted(null)
-    setSubmitError(null)
-    setHasAnalyzed(false)
-    setShowResults(false)
-    setMarket(null)
-    setCompetitors([])
-    setProjectData(null)
+    resetProject()
+    setDataReady(false)
+    setStepsReady(false)
   }
 
   return (
