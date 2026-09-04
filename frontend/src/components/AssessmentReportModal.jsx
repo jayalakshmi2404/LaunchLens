@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { downloadAssessmentReportPdf } from '../services/api.js';
+import { buildPrintableReportHtml } from '../utils/printableReport.js';
 import './AssessmentReportModal.css';
 
 export default function AssessmentReportModal({ reportData, projectData, onClose }) {
@@ -9,7 +10,23 @@ export default function AssessmentReportModal({ reportData, projectData, onClose
   if (!reportData) return null;
 
   const handlePrint = () => {
-    window.print();
+    // Print a standalone window containing only the report content, built from
+    // the same reportData shown on screen. This avoids relying on the app's
+    // own CSS (modals/overlays/backdrop-filters) to isolate what gets printed,
+    // which is what was causing blank printed pages.
+    const printWindow = window.open('', '_blank', 'width=900,height=1100');
+    if (!printWindow) {
+      alert('Your browser blocked the print window. Please allow pop-ups for this site and try again.');
+      return;
+    }
+    const html = buildPrintableReportHtml(reportData);
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.onload = () => {
+      printWindow.focus();
+      printWindow.print();
+    };
   };
 
   const handleDownloadPdf = async () => {
@@ -41,8 +58,7 @@ export default function AssessmentReportModal({ reportData, projectData, onClose
       await downloadAssessmentReportPdf(payload);
     } catch (err) {
       console.error('Error downloading PDF file:', err);
-      // Fallback to window.print() if API call fails
-      window.print();
+      alert('Could not generate the PDF right now. Please try again, or use Print Report / Export JSON instead.');
     } finally {
       setDownloadingPdf(false);
     }

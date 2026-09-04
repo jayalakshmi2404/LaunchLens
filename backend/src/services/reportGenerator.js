@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer';
+import PDFDocument from 'pdfkit';
 import { generateAiRecommendations } from './aiService.js';
 import { generateMitigations } from './mitigationEngine.js';
 import { runLangGraphWorkflow } from './langgraphWorkflow.js';
@@ -245,31 +245,177 @@ export function generateReportHtml(report) {
   `;
 }
 
-/**
- * Generate PDF buffer using headless Chromium (Puppeteer).
- * Cross-platform: works on Windows, Linux, and macOS (dev boxes, containers, cloud hosts).
- */
-export async function generateReportPdfBuffer(report) {
-  const htmlContent = generateReportHtml(report);
+const PAGE_MARGIN = 42;
 
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-  });
-
-  try {
-    const page = await browser.newPage();
-    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: { top: '12mm', bottom: '12mm', left: '12mm', right: '12mm' }
-    });
-    return pdfBuffer;
-  } catch (err) {
-    console.error('[PdfBuffer] Failed to compile PDF via headless Chromium:', err.message);
-    throw err;
-  } finally {
-    await browser.close();
+function ensureSpace(doc, neededHeight) {
+  const bottom = doc.page.height - doc.page.margins.bottom;
+  if (doc.y + neededHeight > bottom) {
+    doc.addPage();
   }
+}
+
+function sectionHeading(doc, text) {
+  ensureSpace(doc, 40);
+  doc.x = doc.page.margins.left;
+  doc.moveDown(0.6);
+  doc.font('Helvetica-Bold').fontSize(13).fillColor('#000000').text(text);
+  const y = doc.y + 2;
+  doc.moveTo(doc.page.margins.left, y)
+    .lineTo(doc.page.width - doc.page.margins.right, y)
+    .lineWidth(1).strokeColor('#000000').stroke();
+  doc.moveDown(0.6);
+}
+
+function cardBox(doc, label, value) {
+  const width = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+  doc.font('Helvetica-Bold').fontSize(10);
+  const labelWidth = doc.widthOfString(`${label} `);
+  doc.font('Helvetica').fontSize(10);
+  const text = `${label} ${value ?? ''}`;
+  const height = doc.heightOfString(text, { width: width - 16 }) + 12;
+  ensureSpace(doc, height + 6);
+  const startY = doc.y;
+  doc.rect(doc.page.margins.left, startY, width, height).strokeColor('#000000').lineWidth(0.75).stroke();
+  doc.font('Helvetica-Bold').fontSize(10).fillColor('#000000')
+    .text(label, doc.page.margins.left + 8, startY + 6, { continued: true, width: width - 16 });
+  doc.font('Helvetica').fontSize(10).text(` ${value ?? ''}`, { width: width - 16 - labelWidth });
+  doc.x = doc.page.margins.left;
+  doc.y = startY + height + 6;
+}
+
+/**
+ * Draws a simple bordered table. `rows[0]` is treated as the header row.
+ * colWidths must sum to the available content width.
+ */
+function drawTable(doc, colWidths, rows) {
+  doc.x = doc.page.margins.left;
+  const startX = doc.page.margins.left;
+  const cellPad = 5;
+
+  rows.forEach((row, rowIndex) => {
+    doc.font(rowIndex === 0 ? 'Helvetica-Bold' : 'Helvetica').fontSize(9);
+    const cellHeights = row.map((cell, i) =>
+      doc.heightOfString(String(cell ?? ''), { width: colWidths[i] - cellPad * 2 })
+    );
+    const rowHeight = Math.max(...cellHeights) + cellPad * 2;
+
+    ensureSpace(doc, rowHeight);
+    const y = doc.y;
+    let x = startX;
+
+    row.forEach((cell, i) => {
+      if (rowIndex === 0) {
+        doc.rect(x, y, colWidths[i], rowHeight).fillColor('#f2f2f2').fill();
+      }
+      doc.rect(x, y, colWidths[i], rowHeight).strokeColor('#000000').lineWidth(0.75).stroke();
+      doc.fillColor('#000000').font(rowIndex === 0 ? 'Helvetica-Bold' : 'Helvetica').fontSize(9)
+        .text(String(cell ?? ''), x + cellPad, y + cellPad, { width: colWidths[i] - cellPad * 2 });
+      x += colWidths[i];
+    });
+
+    doc.y = y + rowHeight;
+  });
+  doc.moveDown(0.6);
+}
+
+/**
+ * Generate PDF buffer using pdfkit — a pure-JavaScript PDF generator with no
+ * external browser/binary dependency, so it works reliably on any host
+ * (Render, Heroku, Docker, local dev) without needing Chromium installed.
+ */
+export function generateReportPdfBuffer(report) {
+  return new Promise((resolve, reject) => {
+    const { summary, milestone1, milestone2, milestone3 } = report;
+    const doc = new PDFDocument({ size: 'A4', margin: PAGE_MARGIN, bufferPages: true });
+    const chunks = [];
+    doc.on('data', (chunk) => chunks.push(chunk));
+    doc.on('end', () => resolve(Buffer.concat(chunks)));
+    doc.on('error', reject);
+
+    const contentWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+
+    try {
+      // Title block
+      doc.font('Helvetica-Bold').fontSize(16).fillColor('#000000')
+        .text('LAUNCHLENS', { align: 'center', characterSpacing: 2 });
+      doc.font('Helvetica-Bold').fontSize(18)
+        .text('COMPREHENSIVE STARTUP ASSESSMENT REPORT', { align: 'center' });
+      doc.font('Helvetica-Oblique').fontSize(10).fillColor('#333333')
+        .text(`Report ID: ${report.reportId} | Generated: ${new Date(report.generatedAt).toLocaleString()}`, { align: 'center' });
+      doc.moveDown(0.5);
+      doc.moveTo(doc.page.margins.left, doc.y)
+        .lineTo(doc.page.width - doc.page.margins.right, doc.y)
+        .lineWidth(1.5).strokeColor('#000000').stroke();
+      doc.moveDown(0.8);
+
+      // Section 1
+      sectionHeading(doc, '1. Executive Summary & Project Profile');
+      cardBox(doc, 'Project Name:', summary.projectName);
+      cardBox(doc, 'Industry:', summary.industry);
+      cardBox(doc, 'Business Model:', summary.businessModel);
+      cardBox(doc, 'Budget:', summary.budget);
+      cardBox(doc, 'Target Market:', summary.targetMarket);
+      cardBox(doc, 'Overall Risk Level:', `${summary.riskLevel} (${summary.overallRiskScore}/100)`);
+      cardBox(doc, 'Market Fit Rating:', `${summary.marketFitPercentage}%`);
+      cardBox(doc, 'Quality Audit Score:', `${summary.qualityAuditScore}/100`);
+      cardBox(doc, 'Project Description:', summary.description);
+
+      // Section 2
+      sectionHeading(doc, '2. Market Intelligence & Competitors (Milestone 1)');
+      const m = milestone1.marketSizing;
+      drawTable(doc, [contentWidth * 0.3, contentWidth * 0.25, contentWidth * 0.2, contentWidth * 0.25], [
+        ['Metric', 'INR Value', 'Annual Growth', 'Source'],
+        ['TAM', `₹${m.tamCr} Cr`, `+${m.tamGrowthPct}%`, m.source],
+        ['SAM', `₹${m.samCr} Cr`, `+${m.samGrowthPct}%`, ''],
+        ['SOM', `₹${m.somCr} Cr`, `${m.somGrowthPct}%`, '']
+      ]);
+
+      const compRows = [
+        ['Competitor', 'Type', 'Market Share', 'Revenue'],
+        ...milestone1.competitors.map(c => [c.name, c.type, `${c.marketSharePct}%`, c.revenueCr ? `₹${c.revenueCr} Cr` : 'N/A'])
+      ];
+      drawTable(doc, [contentWidth * 0.3, contentWidth * 0.25, contentWidth * 0.2, contentWidth * 0.25], compRows);
+
+      // Section 3
+      sectionHeading(doc, '3. Risk Assessment & Feasibility (Milestone 2)');
+      const riskRows = [
+        ['Risk Category', 'Score', 'Severity', 'Trigger Condition'],
+        ...milestone2.riskCategories.map(r => [r.name, `${r.score}/100`, r.severity, r.trigger])
+      ];
+      drawTable(doc, [contentWidth * 0.22, contentWidth * 0.13, contentWidth * 0.15, contentWidth * 0.5], riskRows);
+      cardBox(doc, 'Feasibility Analysis Verdict:', milestone2.feasibilityVerdict);
+
+      // Section 4
+      sectionHeading(doc, '4. AI Strategic Recommendations (Milestone 3 Task 1)');
+      milestone3.aiRecommendations.forEach((rec, i) => {
+        cardBox(doc, `${i + 1}. ${rec.title} [${rec.priority}]`, '');
+        doc.font('Helvetica').fontSize(9.5).fillColor('#000000').text(rec.body, { width: contentWidth });
+        doc.font('Helvetica-Oblique').fontSize(8.5).fillColor('#444444')
+          .text(`Data Rationale: ${rec.rationale}`, { width: contentWidth });
+        doc.moveDown(0.5);
+      });
+
+      // Section 5
+      sectionHeading(doc, '5. Risk Mitigations & Action Items (Milestone 3 Task 2)');
+      milestone3.mitigations.forEach((mit, i) => {
+        cardBox(doc, `Risk #${i + 1}: ${mit.riskProblem} [${mit.severity}]`, '');
+        doc.font('Helvetica').fontSize(9.5).fillColor('#000000');
+        doc.text(`Strategy: ${mit.mitigationStrategy}`, { width: contentWidth });
+        doc.text(`30-Day Action: ${mit.recommendedAction}`, { width: contentWidth });
+        doc.text(`Expected Outcome: ${mit.expectedOutcome}`, { width: contentWidth });
+        doc.moveDown(0.5);
+      });
+
+      // Section 6
+      sectionHeading(doc, '6. LangGraph Workflow & Quality Audit (Milestone 3 Task 3)');
+      cardBox(doc, 'Workflow Execution Status:', milestone3.workflowStatus.success ? 'SUCCESS (COMPLETED)' : 'PROCESSING');
+      cardBox(doc, 'Nodes Executed:', `${milestone3.workflowStatus.nodesExecuted} Nodes (8-Node Graph)`);
+      cardBox(doc, 'Quality Audit Score:', `${milestone3.workflowStatus.qualityScore} / 100`);
+
+      doc.end();
+    } catch (err) {
+      doc.end();
+      reject(err);
+    }
+  });
 }
